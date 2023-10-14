@@ -6,9 +6,10 @@ module.exports.convertCsvToObject = (csvString) => {
   const csvHeader = csvLines.shift().split(',');
   return csvLines.map((line) => {
     const values = line.split(',');
-    return values.reduce((csvObject, value, index) => {
-      csvObject[csvHeader[index]] = value;
-      return csvObject;
-    }, {});
+    const csvObject = {};
+    for (let index = 0; index < csvHeader.length; index++) {
+      csvObject[csvHeader[index]] = values[index];
+    }
+    return csvObject;
   });
 };
