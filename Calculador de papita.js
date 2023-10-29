@@ -2,9 +2,10 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: red; icon-glyph: terminal;
 const main = async () => {
+  const targetCalories = 65;
   const potatoSize = await getPotatoSize();
   if (potatoSize !== null) {
-    const resultMessage = displayResults(potatoSize);
+    const resultMessage = displayResults(potatoSize, targetCalories);
     const alert = new Alert();
     alert.title = "Resultado";
     alert.message = resultMessage;
@@ -33,10 +34,9 @@ const calculateButterAmount = (potatoSize) => {
   return potatoSize * butterRatio;
 };
 
-const calculatePotatoAmount = (potatoSize) => {
+const calculatePotatoAmount = (potatoSize, targetCalories) => {
   const potatoCaloriesPer100g = 88;
   const butterCaloriesPer14g = 101;
-  const targetCalories = 60;
   const butterAmount = calculateButterAmount(potatoSize);
   const totalSize = potatoSize + butterAmount;
   const potatoTotalCalories = (potatoSize * potatoCaloriesPer100g) / 100;
@@ -45,10 +45,11 @@ const calculatePotatoAmount = (potatoSize) => {
   return (targetCalories * totalSize) / totalCalories;
 };
 
-const displayResults = (potatoSize) => {
+const displayResults = (potatoSize, targetCalories) => {
   const butterAmount = calculateButterAmount(potatoSize);
-  const potatoAmount = calculatePotatoAmount(potatoSize);
-  return `Agrega ${butterAmount.toFixed(2)} gramos de mantequilla a tus ${potatoSize} gramos de papa.\nPuedes comer ${potatoAmount.toFixed(2)} gramos de papa para una porción equivalente a 60kcal.`;
+  const potatoAmount = calculatePotatoAmount(potatoSize, targetCalories);
+  return `Agrega ${butterAmount.toFixed(2)} gramos de mantequilla a tus ${potatoSize} gramos de papa.\n
+  Puedes comer ${potatoAmount.toFixed(2)} gramos de papa para una porción equivalente a ${targetCalories}kcal.`;
 };
 
 await main();
