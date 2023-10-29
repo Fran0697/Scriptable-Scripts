@@ -1,32 +1,20 @@
 // Variables used by Scriptable.
 // These must be at the very top of the file. Do not edit.
 // icon-color: red; icon-glyph: terminal;
-const main = async () => {
-  const targetCalories = 65;
-  const potatoSize = await getPotatoSize();
-  if (potatoSize !== null) {
-    const resultMessage = displayResults(potatoSize, targetCalories);
-    const alert = new Alert();
-    alert.title = "Resultado";
-    alert.message = resultMessage;
-    alert.addAction("OK");
-    await alert.presentAlert();
-  }
-};
+const inputService = importModule('InputService');
+const alertService = importModule('AlertService');
 
-const getPotatoSize = async () => {
-  let inputAlert = new Alert();
-  inputAlert.title = "Tamaño de la papa en gramos";
-  inputAlert.message = "Ingresa el tamaño de la papa:";
-  inputAlert.addTextField("Tamaño de la papa", "");
-  inputAlert.addAction("Calcular");
-  inputAlert.addCancelAction("Cancelar");
-  let pressedButton = await inputAlert.presentAlert();
-  if (pressedButton === -1) {
-    return null;
-  } else {
-    return parseFloat(inputAlert.textFieldValue(0));
+const main = async () => {
+  const potatoSize = await inputService.getNumberInput("Tamaño de la papa en gramos", "Ingresa el tamaño de la papa:", "gr", "Calcular", "Cancelar");
+  if (potatoSize === null) {
+    return;
   }
+  const targetCalories = await inputService.getNumberInput("Cuantas calorias quieres comer?", "Ingresa las Kcal:", "kcal", "Ingresar", "Cancelar");
+  if (targetCalories === null) {
+    return;
+  }
+  const resultMessage = generateResultMessage(potatoSize, targetCalories);
+  await alertService.sendAlert("Resultado", resultMessage, "OK");
 };
 
 const calculateButterAmount = (potatoSize) => {
@@ -34,20 +22,21 @@ const calculateButterAmount = (potatoSize) => {
   return potatoSize * butterRatio;
 };
 
-const calculatePotatoAmount = (potatoSize, targetCalories) => {
-  const potatoCaloriesPer100g = 88;
-  const butterCaloriesPer14g = 101;
-  const butterAmount = calculateButterAmount(potatoSize);
-  const totalSize = potatoSize + butterAmount;
-  const potatoTotalCalories = (potatoSize * potatoCaloriesPer100g) / 100;
-  const butterTotalCalories = (butterAmount * butterCaloriesPer14g) / 14
-  const totalCalories = potatoTotalCalories + butterTotalCalories
-  return (targetCalories * totalSize) / totalCalories;
+const calculatePotatoAmount = (potatoSize, butterAmount, targetCalories) => {
+  return (targetCalories * (potatoSize + butterAmount)) / getTotalCalories(potatoSize, butterAmount);
 };
 
-const displayResults = (potatoSize, targetCalories) => {
+const getTotalCalories = (potatoSize, butterAmount) => {
+  const potatoCaloriesPer100g = 88;
+  const butterCaloriesPer14g = 101;
+  const potatoTotalCalories = (potatoSize * potatoCaloriesPer100g) / 100;
+  const butterTotalCalories = (butterAmount * butterCaloriesPer14g) / 14
+  return potatoTotalCalories + butterTotalCalories
+}
+
+const generateResultMessage = (potatoSize, targetCalories) => {
   const butterAmount = calculateButterAmount(potatoSize);
-  const potatoAmount = calculatePotatoAmount(potatoSize, targetCalories);
+  const potatoAmount = calculatePotatoAmount(potatoSize, butterAmount, targetCalories);
   return `Agrega ${butterAmount.toFixed(2)} gramos de mantequilla a tus ${potatoSize} gramos de papa.\n
   Puedes comer ${potatoAmount.toFixed(2)} gramos de papa para una porción equivalente a ${targetCalories}kcal.`;
 };
