@@ -18,7 +18,7 @@ module.exports.getNumberInput = async (title, message, textField, action, cancel
       return null;
     } else {
       let input = parseFloat(inputAlert.textFieldValue(0));
-      if (!isNaN(input)) {
+      if (!isNaN(input) && input > 0) {
         return input;
       }
       firstFail = true;
