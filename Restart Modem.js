@@ -17,10 +17,11 @@ const main = async () => {
     }
 };
 
-const formatString = (format, ...args) =>
-  format.replace(/\${\d+}/g, match => {
-    const index = parseInt(match.substring(2, match.length - 1));
-    return args[index];
-  });
+const formatString = (format, ...args) => {
+    format.replace(/\${\d+}/g, match => {
+        const index = parseInt(match.substring(2, match.length - 1));
+        return args[index];
+    });
+}
 
 await main();
