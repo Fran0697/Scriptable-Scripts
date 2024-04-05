@@ -1,6 +1,6 @@
 // Variables used by Scriptable.
 // These must be at the very top of the file. Do not edit.
-// icon-color: red; icon-glyph: terminal;
+// icon-color: pink; icon-glyph: file-contract;
 const properties = importModule('RestartModemProperties');
 
 const main = async () => {
@@ -26,3 +26,4 @@ const formatString = (format, ...args) => {
 
 
 await main();
+Script.setShortcutOutput('Done!')
