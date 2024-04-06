@@ -4,22 +4,31 @@
 const properties = importModule('RestartLinksysRouterProperties');
 
 const main = async () => {
-    const { ROUTER_BASE_URL, LOGIN_URL, REBOOT_URL, USERNAME, PASSWORD, LOGIN_HEADERS } = properties;
-
     try {
-        const request = new Request(`${ROUTER_BASE_URL}${LOGIN_URL}`);
+        const { ROUTER_BASE_URL, LOGIN_URL, REBOOT_URL, USERNAME, PASSWORD, LOGIN_HEADERS, REBOOT_HEADERS } = properties;
 
-        request.allowInsecureRequest = true;
-        request.method = 'POST';
-        request.body = createLoginBody(USERNAME, PASSWORD);
-        request.headers = LOGIN_HEADERS;
-        const token = (await request.loadJSON()).session.token;
+        //TODO dynamically get the IP of the router
+        const httpClient = new Request('');
+        httpClient.allowInsecureRequest = true;
+        httpClient.method = 'POST';
 
-        request.url = `${ROUTER_BASE_URL}${REBOOT_URL}`
-        request.body = '{}';
-        request.headers = LOGIN_HEADERS;
+        //Login to the router
+        httpClient.url = `${ROUTER_BASE_URL}${LOGIN_URL}`;
+        httpClient.body = createLoginBody(USERNAME, PASSWORD);
+        httpClient.headers = LOGIN_HEADERS;
+        const response = await httpClient.loadJSON();
+
+        //Restart router
+        addSessionToken(REBOOT_HEADERS, response.session.token);
+        httpClient.url = `${ROUTER_BASE_URL}${REBOOT_URL}`;
+        httpClient.body = '{}';
+        httpClient.headers = REBOOT_HEADERS;
+        console.log(httpClient);
+        await httpClient.load();
+        return true;
     } catch (error) {
         console.log(error);
+        return null;
     }
 };
 
@@ -35,5 +44,14 @@ const createLoginBody = (username, password) => {
     return JSON.stringify(sessionJSON);
 };
 
-await main();
-Script.setShortcutOutput('Done!');
+const addSessionToken = (headers, token) => {
+    Object.entries(headers).find(([key, value]) => {
+        if (value === null) {
+            headers[key] = token;
+            return true;
+        }
+    });
+};
+
+const successfull = await main();
+Script.setShortcutOutput(successfull);
