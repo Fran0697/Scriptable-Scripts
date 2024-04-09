@@ -1,9 +1,9 @@
 // Variables used by Scriptable.
 // These must be at the very top of the file. Do not edit.
 // icon-color: cyan; icon-glyph: cogs;
-module.exports.sendEmailWithAttachments = async (subject, body, sender, recipients, filePaths) => {
+const sendEmail = async (subject, body, sender, recipients, filePaths = []) => {
   try {
-    if (!subject || !body || !sender || !recipients.length || !recipients.length) {
+    if (!subject || !body || !sender || !recipients.length) {
       throw new Error('Missing required parameters for sending email.');
     }
 
@@ -14,7 +14,6 @@ module.exports.sendEmailWithAttachments = async (subject, body, sender, recipien
 
     if (sender.includes('@')) {
       mail.preferedSendingEmailddress = sender;
-      
     } else {
       throw new Error('Invalid sender email address.');
     }
@@ -25,10 +24,7 @@ module.exports.sendEmailWithAttachments = async (subject, body, sender, recipien
       throw new Error('Invalid recipient email address.');
     }
 
-    filePaths.forEach(filePath => {
-      if (!filePath) {
-        throw new Error('Invalid file path for attachment.');
-      }
+    filePaths.filter(filePath => filePath).forEach(filePath => {
       mail.addFileAttachment(filePath);
     });
 
@@ -36,4 +32,13 @@ module.exports.sendEmailWithAttachments = async (subject, body, sender, recipien
   } catch (error) {
     throw new Error(`Error sending email: ${error.message}`);
   }
+};
+
+module.exports.sendEmail = sendEmail;
+
+module.exports.sendEmailWithAttachments = async (subject, body, sender, recipients, filePaths) => {
+  if (filePaths === null) {
+    throw new Error('File paths cannot be null.');
+  }
+  await sendEmail(subject, body, sender, recipients, filePaths);
 };
