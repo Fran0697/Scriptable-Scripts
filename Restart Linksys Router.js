@@ -33,25 +33,27 @@ const createHttpClient = async () => {
     return httpClient;
 };
 
-const sendRequest = async (httpClient, url, body = '{}', headers = {}) => {
+const sendRequest = async (httpClient, url, body = '{}', headers = {}, jsonResponse) => {
     httpClient.url = url;
     httpClient.body = body;
     httpClient.headers = headers;
-    await httpClient.load();
+    const response = await (jsonResponse ? httpClient.loadJSON() : httpClient.load());
+    return response;
 };
 
 const loginToRouter = async (httpClient) => {
     const url = `${ROUTER_BASE_URL}${LOGIN_URL}`;
     const body = createLoginBody(USERNAME, PASSWORD);
     const headers = LOGIN_HEADERS;
-    return await sendRequest(httpClient, url, body, headers);
+    const response = await sendRequest(httpClient, url, body, headers, true);
+    return response;
 };
 
 const rebootRouter = async (httpClient, token) => {
     const url = `${ROUTER_BASE_URL}${REBOOT_URL}`;
     const headers = { ...REBOOT_HEADERS };
     addSessionToken(headers, token);
-    await sendRequest(httpClient, url, '{}', headers);
+    await sendRequest(httpClient, url, '{}', headers, false);
 };
 
 const createLoginBody = (username, password) => {
