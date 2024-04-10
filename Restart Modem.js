@@ -32,7 +32,7 @@ const createHttpClient = async () => {
 
 const sendRequest = async (httpClient, url) => {
     httpClient.url = url;
-    await request.load();
+    await httpClient.load();
 };
 
 const loginToModem = async (httpClient) => {
