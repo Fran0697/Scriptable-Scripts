@@ -56,4 +56,5 @@ const logError = async (error) => {
     await emailService.sendEmail('Restart Modem failure', error, EMAIL_SENDER, EMAIL_RECIPIENTS);
 };
 
-Script.setShortcutOutput(await restartModem());
+const output = await restartModem();
+Script.setShortcutOutput(output);

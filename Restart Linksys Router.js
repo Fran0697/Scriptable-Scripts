@@ -76,4 +76,5 @@ const logError = async (error) => {
     await emailService.sendEmail('Restart Linksys Router failure', error, EMAIL_SENDER, EMAIL_RECIPIENTS);
 };
 
-Script.setShortcutOutput(await restartRouter());
+const output = await restartRouter();
+Script.setShortcutOutput(output);
