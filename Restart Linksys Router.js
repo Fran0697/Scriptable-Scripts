@@ -1,27 +1,19 @@
 // Variables used by Scriptable.
 // These must be at the very top of the file. Do not edit.
 // icon-color: red; icon-glyph: terminal;
-const emailService = importModule('EmailService');
-const {
-    ROUTER_BASE_URL,
-    LOGIN_URL,
-    REBOOT_URL,
-    USERNAME,
-    PASSWORD,
-    LOGIN_HEADERS,
-    REBOOT_HEADERS,
-    EMAIL_RECIPIENTS,
-    EMAIL_SENDER
-} = importModule('RestartLinksysRouterProperties');;
+const { USERNAME: MODEM_USERNAME, PASSWORD: MODEM_PASSWORD } = importModule('RestartModemProperties');
+const { ROUTER_NAME, LOGIN_URL, REBOOT_URL, USERNAME, PASSWORD, LOGIN_HEADERS, REBOOT_HEADERS, EMAIL_RECIPIENTS, EMAIL_SENDER } = importModule('RestartLinksysRouterProperties');
+const modemService = importModule('ModemService');
 
 const restartRouter = async () => {
     try {
+        const routerIp = await modemService.getRouterIpByName(ROUTER_NAME, MODEM_USERNAME, MODEM_PASSWORD);
         const httpClient = await createHttpClient();
-        const response = await loginToRouter(httpClient);
-        await rebootRouter(httpClient, response.session.token);
+        const response = await loginToRouter(routerIp, httpClient);
+        await rebootRouter(routerIp, httpClient, response.session.token);
         return true;
     } catch (error) {
-        await logError(error);
+        console.log(error)
         return false;
     }
 };
@@ -41,16 +33,16 @@ const sendRequest = async (httpClient, url, body = '{}', headers = {}, jsonRespo
     return response;
 };
 
-const loginToRouter = async (httpClient) => {
-    const url = `${ROUTER_BASE_URL}${LOGIN_URL}`;
+const loginToRouter = async (routerIp, httpClient) => {
+    const url = `https://${routerIp}/${LOGIN_URL}`;
     const body = createLoginBody(USERNAME, PASSWORD);
     const headers = LOGIN_HEADERS;
     const response = await sendRequest(httpClient, url, body, headers, true);
     return response;
 };
 
-const rebootRouter = async (httpClient, token) => {
-    const url = `${ROUTER_BASE_URL}${REBOOT_URL}`;
+const rebootRouter = async (routerIp, httpClient, token) => {
+    const url = `https://${routerIp}/${REBOOT_URL}`;
     const headers = { ...REBOOT_HEADERS };
     addSessionToken(headers, token);
     await sendRequest(httpClient, url, '{}', headers, false);
@@ -72,10 +64,6 @@ const addSessionToken = (headers, token) => {
     if (key) {
         headers[key] = token;
     }
-};
-
-const logError = async (error) => {
-    await emailService.sendEmail('Restart Linksys Router failure', error, EMAIL_SENDER, EMAIL_RECIPIENTS);
 };
 
 const output = await restartRouter();
