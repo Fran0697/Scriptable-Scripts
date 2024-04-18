@@ -3,6 +3,18 @@
 // icon-color: cyan; icon-glyph: cogs;
 const { MODEM_BASE_URL, REBOOT_COMMAND, LOGIN_COMMAND, CLIENT_LIST_COMMAND } = importModule('RestartModemProperties');
 
+module.exports.rebootModem = async (username, password) => {
+    const authenticatedClient = await createAuthenticatedClient(username, password);
+    const url = `${MODEM_BASE_URL}${REBOOT_COMMAND}`;
+    await sendRequest(authenticatedClient, url);
+};
+
+module.exports.getRouterIpByName = async (routerName, username, password) => {
+    const authenticatedClient = await createAuthenticatedClient(username, password);
+    const routerIp = await getRouterIpByName(authenticatedClient, routerName);
+    return routerIp;
+};
+
 const createAuthenticatedClient = async (username, password) => {
     const httpClient = new Request('');
     httpClient.allowInsecureRequest = true;
@@ -36,16 +48,4 @@ const formatString = (format, ...args) => {
         const index = parseInt(match.substring(2, match.length - 1));
         return args[index];
     });
-};
-
-module.exports.rebootModem = async (username, password) => {
-    const authenticatedClient = await createAuthenticatedClient(username, password);
-    const url = `${MODEM_BASE_URL}${REBOOT_COMMAND}`;
-    await sendRequest(authenticatedClient, url);
-};
-
-module.exports.getRouterIpByName = async (routerName, username, password) => {
-    const authenticatedClient = await createAuthenticatedClient(username, password);
-    const routerIp = await getRouterIpByName(authenticatedClient, routerName);
-    return routerIp;
 };
