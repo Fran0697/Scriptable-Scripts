@@ -21,6 +21,7 @@ const createAuthenticatedClient = async (username, password) => {
     await loginToModem(httpClient, username, password);
     return httpClient;
 };
+
 const sendRequest = async (httpClient, url) => {
     httpClient.url = url;
     const response = await httpClient.loadString();
