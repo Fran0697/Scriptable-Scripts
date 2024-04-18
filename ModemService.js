@@ -1,6 +1,6 @@
 // Variables used by Scriptable.
 // These must be at the very top of the file. Do not edit.
-// icon-color: deep-gray; icon-glyph: magic;
+// icon-color: cyan; icon-glyph: cogs;
 const { MODEM_BASE_URL, REBOOT_COMMAND, LOGIN_COMMAND, CLIENT_LIST_COMMAND } = importModule('RestartModemProperties');
 
 const createAuthenticatedClient = async (username, password) => {
