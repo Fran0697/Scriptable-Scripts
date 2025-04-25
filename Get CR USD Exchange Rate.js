@@ -7,7 +7,6 @@ const main = async () => {
   const exchangeRate = await getExchangeRate(exchangeRateEndpoint);
   const formattedExchangeRate = formatExchangeRate(exchangeRate);
   const output = generateOutput(formattedExchangeRate);
-
   Script.setShortcutOutput(output);
 };
 
